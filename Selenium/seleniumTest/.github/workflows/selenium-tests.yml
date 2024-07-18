@@ -1,0 +1,33 @@
+name: Selenium Tests
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  selenium-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Install ChromeDriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4
+          wget -N https://chromedriver.storage.googleapis.com/94.0.4606.41/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip -d /usr/local/bin/
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Run Selenium tests
+        run: xvfb-run -a dotnet test
